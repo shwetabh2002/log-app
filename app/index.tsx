@@ -13,14 +13,12 @@ import {
 } from '../components/ui';
 import { api } from '../lib/api';
 import { routeAfterAuth } from '../lib/authFlow';
+import { DEV_TEST_ACCOUNTS, isDevToolsEnabled } from '../lib/env';
 import { colors, radius, spacing } from '../lib/theme';
 import { clearToken, getToken, saveToken } from '../lib/storage';
 import { useToast } from '../lib/useToast';
 
-const TEST_ACCOUNTS = {
-  carrier: { login: 'testcarrier', password: 'test1234' },
-  shipper: { login: 'testshipper', password: 'test1234' },
-};
+const SHOW_DEV_LOGIN = isDevToolsEnabled() && DEV_TEST_ACCOUNTS !== null;
 
 const WEB_URL = process.env.EXPO_PUBLIC_WEB_URL ?? 'http://localhost:3000';
 
@@ -132,28 +130,28 @@ export default function LoginScreen() {
         />
       </View>
 
-      {__DEV__ && (
+      {SHOW_DEV_LOGIN && DEV_TEST_ACCOUNTS ? (
         <View style={styles.devRow}>
           <Text style={styles.devHint}>Dev</Text>
           <Pressable
-            onPress={() => loginWithCredentials(TEST_ACCOUNTS.carrier)}
+            onPress={() => loginWithCredentials(DEV_TEST_ACCOUNTS.carrier)}
             disabled={submitting}
             style={({ pressed }) => [styles.devChip, pressed && styles.devChipPressed]}
           >
             <Text style={styles.devChipText}>Carrier</Text>
           </Pressable>
           <Pressable
-            onPress={() => loginWithCredentials(TEST_ACCOUNTS.shipper)}
+            onPress={() => loginWithCredentials(DEV_TEST_ACCOUNTS.shipper)}
             disabled={submitting}
             style={({ pressed }) => [styles.devChip, pressed && styles.devChipPressed]}
           >
             <Text style={styles.devChipText}>Shipper</Text>
           </Pressable>
         </View>
-      )}
+      ) : null}
 
       <Text style={styles.registerHint}>
-        No account? Register at {WEB_URL.replace(/^https?:\/\//, '')}/register
+        No account? Request access at {WEB_URL.replace(/^https?:\/\//, '')}/join
       </Text>
     </Screen>
   );
